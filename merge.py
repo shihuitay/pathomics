@@ -60,4 +60,4 @@ def merge(folder:str):
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
     folders = [os.path.join(PARENT_DIR, p) for p in os.listdir(PARENT_DIR) if os.path.isdir(os.path.join(PARENT_DIR, p))]
-    merge(folders[2])
+    merge(folders[3])
