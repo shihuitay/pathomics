@@ -181,10 +181,10 @@ def rename_all(folder:str):
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
     # save_medians(PARENT_DIR)
-    folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv')]
+    # folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv')]
+    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
     for folder in folders:
         # split_to_groups(folder)
-        # copy_to_merge(folder)
-        # color_code(folder)
+        copy_to_merge(folder)
+        color_code(folder)
         rename_all(folder)
-

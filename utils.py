@@ -82,7 +82,8 @@ if __name__ == '__main__':
     # undo_filter(PARENT_DIR)
     # count_files(PARENT_DIR, 'blank')
     # delete_file(PARENT_DIR, '_new.geojson')
-    delete_folder(PARENT_DIR, 'merge')
+    # delete_folder(PARENT_DIR, 'merge')
+    
     
 
 
