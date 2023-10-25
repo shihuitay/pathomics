@@ -200,7 +200,8 @@ if __name__ == '__main__':
     TILE_SIZE = 250
     parent_dir = os.getcwd()
     directory = f'/Users/shihuitay/Desktop/pathomics/data/{TILE_SIZE}/'
-    filepaths = [os.path.abspath(os.path.join(directory, p)) for p in os.listdir(directory) if p!= '.DS_Store' and not p.endswith('.csv')]
+    # filepaths = [os.path.abspath(os.path.join(directory, p)) for p in os.listdir(directory) if p!= '.DS_Store' and not p.endswith('.csv')]
+    filepaths = [os.path.abspath(os.path.join(directory, '/Users/shihuitay/Desktop/pathomics/data/250/19RR060060-A-06-01_HE-STAIN_20191014_141613'))]
     csv_path = os.path.join(parent_dir, 'data', str(TILE_SIZE), 'output.csv')
     if not os.path.isfile(csv_path):
         with open(csv_path, 'a', newline='') as csv_file:

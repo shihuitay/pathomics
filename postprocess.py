@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import shutil
 import re
 import os
@@ -49,7 +50,50 @@ def save_medians(directory:str):
                     global_median_immune, global_immune,
                     local_median_immune, local_immune]
             final_data.loc[len(final_data)] = new_row
-    final_data.to_csv(os.path.join(directory, 'final_number.csv')) 
+    final_data.to_csv(os.path.join(directory, 'median.csv')) 
+
+def save_q1s(directory:str):
+    '''
+    select the tiles where the number of cells is above global/local lower quartile (q1)
+    directory: parent folder containing the subfolders representing each WSI
+    returns: a csv file containing global and local medians for each WSI
+    '''
+    global_data = pd.DataFrame(columns=["Object ID", "Number of Tumor Cell", "Number of Immune Cell"])
+    final_data = pd.DataFrame(columns=["Filename", "Global q1 tumor", "No. of tumor-rich tiles (global)",
+                                       "Local q1 tumor", "No. of tumor-rich tiles (local)",
+                                       "Global q1 immune", "No. of immune-rich tiles (global)", 
+                                       "Local q1 immune","No. of immune-rich tiles (local)"])
+    for folder in os.listdir(directory):
+        if os.path.isdir(os.path.join(directory, folder)):
+            detection_csv = os.path.join(directory, folder, 'detection.csv')
+            if not os.path.isfile(detection_csv):
+                continue
+            data = pd.read_csv(detection_csv)
+            global_data = pd.concat([global_data, data], ignore_index=True)
+    global_q1_tumor = np.percentile(global_data["Number of Tumor Cell"], 25)
+    global_q1_immune = np.percentile(global_data["Number of Immune Cell"], 25)
+    print(f'Global q1 for tumor cells is {global_q1_tumor}')
+    print(f'Global q1 for immune cells is {global_q1_immune}')
+   
+    for folder in os.listdir(directory):
+        if os.path.isdir(os.path.join(directory, folder)):
+            detection_csv = os.path.join(directory, folder, 'detection.csv')
+            if not os.path.isfile(detection_csv):
+                continue
+            data = pd.read_csv(detection_csv)
+            local_q1_tumor = np.percentile(data['Number of Tumor Cell'], 25)
+            local_q1_immune = np.percentile(data['Number of Immune Cell'], 25)
+            local_tumor = len(data[data["Number of Tumor Cell"] > local_q1_tumor])
+            local_immune = len(data[data["Number of Immune Cell"] > local_q1_immune])
+            global_tumor = len(data[data["Number of Tumor Cell"] > global_q1_tumor])
+            global_immune = len(data[data["Number of Immune Cell"] > global_q1_immune])
+            new_row = [folder, global_q1_tumor, global_tumor, 
+                    local_q1_tumor, local_tumor,
+                    global_q1_immune, global_immune,
+                    local_q1_immune, local_immune]
+            final_data.loc[len(final_data)] = new_row
+    final_data.to_csv(os.path.join(directory, 'q1.csv')) 
+
 
 def split_to_groups(folder:str):
     '''folder: absolute path to the target folder'''
@@ -158,12 +202,18 @@ def rename_all(folder:str):
     if len(tiles)>0:
         sorted_x = sorted(tiles, key=x_sort_key)   # original names, just sorted order
         coorx = {}
-        for num in [name.split('-')[1] for name in sorted_x]:
+        split_sorted_x = []
+        for name in sorted_x:
+            split_sorted_x.append(name.split('-')[1])
+        for num in split_sorted_x:
             if num not in coorx:
                 coorx[num] = len(coorx)
         sorted_y = sorted(tiles, key=y_sort_key)
         coory = {}
-        for num in [name.split('-')[3] for name in sorted_y]:
+        split_sorted_y = []
+        for name in sorted_y:
+            split_sorted_y.append(name.split('-')[3])
+        for num in split_sorted_y:
             if num not in coory:
                 coory[num] = len(coory)
         for tile in tiles:
@@ -181,10 +231,14 @@ def rename_all(folder:str):
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
     # save_medians(PARENT_DIR)
+    save_q1s(PARENT_DIR)
     # folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv')]
-    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
-    for folder in folders:
-        # split_to_groups(folder)
-        copy_to_merge(folder)
-        color_code(folder)
-        rename_all(folder)
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['18rr060026-a-05-01_he-stain_20180226_223447']]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-21-01_HE-STAIN_20210825_143722', '21RR060004-A-29-01_HE-STAIN_20210825_150200']]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
+    # for folder in folders:
+    #     # split_to_groups(folder)
+    #     copy_to_merge(folder)
+    #     color_code(folder)
+    #     rename_all(folder)
