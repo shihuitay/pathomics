@@ -1,5 +1,6 @@
 import os
 from glob import glob
+import pandas as pd
 import shutil
 import csv
 
@@ -20,6 +21,15 @@ def count_files(directory:str, target:str):
         writer.writerow(['Filename', target])
         for filename, value in file_dict.items():
             writer.writerow([filename, value])
+
+def count_detection_classification(directory):
+    '''get df containing number of tumor and immune cells and detection for each WSI'''
+    data = []
+    for file in glob(os.path.join(directory, '*/WSI_detection.csv')):
+        df = pd.read_csv(file)
+        data.append(df.iloc[0].values.tolist())
+    merged = pd.DataFrame(data, columns=['Filename', 'Number of Tumor Cells', 'Number of Immune Cells', 'Number of Detection'])
+    merged.to_csv(os.path.join(directory, 'no_detection_classification.csv'), index=False)      
 
 def undo_filter(directory:str, target:list=None):
     '''
