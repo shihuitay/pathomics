@@ -24,12 +24,18 @@ def count_files(directory:str, target:str):
 
 def count_detection_classification(directory):
     '''get df containing number of tumor and immune cells and detection for each WSI'''
+    patient = pd.read_csv('/Users/shihuitay/Desktop/pathomics/data/patient.csv')
     data = []
     for file in glob(os.path.join(directory, '*/WSI_detection.csv')):
         df = pd.read_csv(file)
-        data.append(df.iloc[0].values.tolist())
-    merged = pd.DataFrame(data, columns=['Filename', 'Number of Tumor Cells', 'Number of Immune Cells', 'Number of Detection'])
-    merged.to_csv(os.path.join(directory, 'no_detection_classification.csv'), index=False)      
+        wsi = df.iloc[0, 0].split('-01')[0].upper()
+        target = patient[patient['WSI']== wsi]
+        to_append = df.iloc[0].values.tolist()
+        to_append.extend([target['Patient'].values[0], target['Subtype'].values[0]])
+        data.append(to_append)
+    merged = pd.DataFrame(data, columns=['Filename', 'Number of Tumor Cells', 'Number of Immune Cells', 'Number of Detection',
+                                        'Patient', 'Subtype'])
+    merged.to_csv(os.path.join(directory, 'no_detection_classification.csv'), index=False)       
 
 def undo_filter(directory:str, target:list=None):
     '''
@@ -88,6 +94,7 @@ def delete_folder(directory:str, target:str):
 
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
+    count_detection_classification(PARENT_DIR)
     # undo_filter(PARENT_DIR, ['tumor', 'immune', 'tumor_immune'])
     # undo_filter(PARENT_DIR)
     # count_files(PARENT_DIR, 'blank')
