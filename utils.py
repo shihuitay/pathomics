@@ -71,13 +71,17 @@ def delete_file(directory:str, target:str):
     '''
     delete specific file across all folders
     directory: parent folder containing the subfolders representing each WSI
-    target: the extension of the files to be deleted
+    target: the extension of the files to be deleted OR the filename
     '''
     for folder in os.listdir(directory):
-        to_delete = os.path.join(directory, folder, f'{folder}'+ target)
-        if os.path.isfile(to_delete):
-            os.remove(to_delete)
-            print("remove ", to_delete)
+        to_delete1 = os.path.join(directory, folder, f'{folder}'+ target)
+        to_delete2 = os.path.join(directory, folder, target)
+        if os.path.isfile(to_delete1):
+            os.remove(to_delete1)
+            print("remove ", to_delete1)
+        elif os.path.isfile(to_delete2):
+            os.remove(to_delete2)
+            print("remove ", to_delete2)
 
 def delete_folder(directory:str, target:str):
     '''
@@ -94,11 +98,11 @@ def delete_folder(directory:str, target:str):
 
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
-    count_detection_classification(PARENT_DIR)
+    # count_detection_classification(PARENT_DIR)
     # undo_filter(PARENT_DIR, ['tumor', 'immune', 'tumor_immune'])
     # undo_filter(PARENT_DIR)
     # count_files(PARENT_DIR, 'blank')
-    # delete_file(PARENT_DIR, '_new.geojson')
+    delete_file(PARENT_DIR, 'detection_031123.csv')
     # delete_folder(PARENT_DIR, 'merge')
     
     

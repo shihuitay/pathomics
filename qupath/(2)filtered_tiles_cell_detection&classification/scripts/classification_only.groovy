@@ -1,14 +1,8 @@
-/**
- * Script to import annotations and perform cell detection, classification & counting on annotated (selected) tiles
- * export the results (cell counts for each category as csv file)
- */
-
 import qupath.lib.gui.scripting.QPEx
 import javax.swing.JFileChooser
 import java.io.FileWriter
 import java.io.IOException
 
-/// import annotation
 parent_dir = '/Users/shihuitay/Desktop/pathomics/data/250/'
 def name = getCurrentServer().getMetadata().getName()
 def filename = name.split("\\.")[0]
@@ -19,7 +13,7 @@ def annotations = getAnnotationObjects()
 selectObjects(annotations)
 
 // reset classification
-
+resetDetectionClassifications()
 // run cell classification
 runObjectClassifier("tumor_immune_021123") 
 
@@ -54,7 +48,7 @@ def csvCells = "Object ID,Number of Tumor Cell,Number of Immune Cell\n" +
 
 // Write CSV content to the file
 try {
-    def csvWriter = new FileWriter("${parent_dir}/${filename}/detection.csv")
+    def csvWriter = new FileWriter("${parent_dir}/${filename}/detection_new.csv")
     csvWriter.append(csvCells.toString())
     csvWriter.flush()
     csvWriter.close()
