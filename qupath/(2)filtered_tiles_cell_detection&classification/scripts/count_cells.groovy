@@ -3,6 +3,11 @@
  * export the results (cell counts for each category as csv file)
  */
 
+// delete pre-existed annotations if needed
+// def annotations = getAnnotationObjects() // Get a list of all annotation objects
+// removeObjects(annotations, false) // True indicates that you want to keep the contained objects, while false removes everything
+// println("All annotations have been deleted.")
+
 import qupath.lib.gui.scripting.QPEx
 import javax.swing.JFileChooser
 import java.io.FileWriter
@@ -33,7 +38,7 @@ selectObjects(annotations)
 
 // run cell detection and classification
 runPlugin('qupath.imagej.detect.cells.WatershedCellDetection', '{"detectionImageBrightfield":"Optical density sum","requestedPixelSizeMicrons":0.2,"backgroundRadiusMicrons":8.0,"backgroundByReconstruction":true,"medianRadiusMicrons":0.0,"sigmaMicrons":1.5,"minAreaMicrons":1.0,"maxAreaMicrons":400.0,"threshold":0.1,"maxBackground":2.0,"watershedPostProcess":true,"cellExpansionMicrons":5.0,"includeNuclei":true,"smoothBoundaries":true,"makeMeasurements":true}')
-runObjectClassifier("tumor vs immune 6") 
+runObjectClassifier("tumor_immune_021123") 
 
 def annotationTumorCounts = [:]
 def annotationImmuneCounts = [:]

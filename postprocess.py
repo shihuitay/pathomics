@@ -98,16 +98,16 @@ def save_q1s(directory:str):
 def split_to_groups(folder:str):
     '''folder: absolute path to the target folder'''
     parent = os.path.dirname(folder)
-    final_csv = pd.read_csv(os.path.join(parent, 'final_number.csv'))
-    local_median = final_csv.set_index('Filename')[['Local median tumor', 'Local median immune']].to_dict()
+    final_csv = pd.read_csv(os.path.join(parent, 'median.csv'))
+    global_median = final_csv.set_index('Filename')[['Global median tumor', 'Global median immune']].to_dict()
     os.makedirs(os.path.join(folder, 'tumor'), exist_ok=True)
     os.makedirs(os.path.join(folder, 'immune'), exist_ok=True)
     os.makedirs(os.path.join(folder, 'tumor_immune'), exist_ok=True)
     obj_id =  pd.read_csv(os.path.join(folder, 'objectID.csv'))
     obj_dict = dict(zip(obj_id['id'], obj_id['filename']))
     df = pd.read_csv(os.path.join(folder, 'detection.csv'))
-    tumor = df[df['Number of Tumor Cell'] > local_median['Local median tumor'][os.path.basename(folder)]] 
-    immune = df[df['Number of Immune Cell'] > local_median['Local median immune'][os.path.basename(folder)]] 
+    tumor = df[df['Number of Tumor Cell'] > global_median['Global median tumor'][os.path.basename(folder)]] 
+    immune = df[df['Number of Immune Cell'] > global_median['Global median immune'][os.path.basename(folder)]] 
     tumor_set = set(tumor['Object ID'].tolist())
     immune_set = set(immune['Object ID'].tolist())
     overlap_files  = list(tumor_set.intersection(immune_set))
@@ -231,14 +231,16 @@ def rename_all(folder:str):
 if __name__ == '__main__':
     PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
     # save_medians(PARENT_DIR)
-    save_q1s(PARENT_DIR)
-    # folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv')]
+    # save_q1s(PARENT_DIR)
+    # folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv') and p!= 'unwanted']
     # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['18rr060026-a-05-01_he-stain_20180226_223447']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-21-01_HE-STAIN_20210825_143722', '21RR060004-A-29-01_HE-STAIN_20210825_150200']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
-    # for folder in folders:
-    #     # split_to_groups(folder)
-    #     copy_to_merge(folder)
-    #     color_code(folder)
-    #     rename_all(folder)
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-12-01_HE-STAIN_20210825_161001', '19RR060020-A-07-01_HE-STAIN_20190711_004017', '18rr060026-a-24-01_he-stain_20180301_113449']]
+    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
+    for folder in folders:
+        split_to_groups(folder)
+        copy_to_merge(folder)
+        color_code(folder)
+        rename_all(folder)

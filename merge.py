@@ -63,6 +63,8 @@ if __name__ == '__main__':
     # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['18rr060026-a-05-01_he-stain_20180226_223447']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-21-01_HE-STAIN_20210825_143722', '21RR060004-A-29-01_HE-STAIN_20210825_150200']]
-    folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-12-01_HE-STAIN_20210825_161001', '19RR060020-A-07-01_HE-STAIN_20190711_004017', '18rr060026-a-24-01_he-stain_20180301_113449']]
+    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
     for folder in folders:
         merge(folder)
