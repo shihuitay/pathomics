@@ -94,7 +94,6 @@ def save_q1s(directory:str):
             final_data.loc[len(final_data)] = new_row
     final_data.to_csv(os.path.join(directory, 'q1.csv')) 
 
-
 def split_to_groups(folder:str):
     '''folder: absolute path to the target folder'''
     parent = os.path.dirname(folder)
@@ -102,7 +101,7 @@ def split_to_groups(folder:str):
     global_median = final_csv.set_index('Filename')[['Global median tumor', 'Global median immune']].to_dict()
     os.makedirs(os.path.join(folder, 'tumor'), exist_ok=True)
     os.makedirs(os.path.join(folder, 'immune'), exist_ok=True)
-    os.makedirs(os.path.join(folder, 'tumor_immune'), exist_ok=True)
+    # os.makedirs(os.path.join(folder, 'tumor_immune'), exist_ok=True)
     obj_id =  pd.read_csv(os.path.join(folder, 'objectID.csv'))
     obj_dict = dict(zip(obj_id['id'], obj_id['filename']))
     df = pd.read_csv(os.path.join(folder, 'detection.csv'))
@@ -110,15 +109,21 @@ def split_to_groups(folder:str):
     immune = df[df['Number of Immune Cell'] > global_median['Global median immune'][os.path.basename(folder)]] 
     tumor_set = set(tumor['Object ID'].tolist())
     immune_set = set(immune['Object ID'].tolist())
-    overlap_files  = list(tumor_set.intersection(immune_set))
     tumor_files = list(tumor_set.difference(immune_set))
     immune_files = list(immune_set.difference(tumor_set))
-    
-    for file in overlap_files:
-        filename = obj_dict[file]
-        src = os.path.join(folder, filename)
-        dest = os.path.join(folder, 'tumor_immune', filename)
-        shutil.move(src, dest)
+    # for file in overlap_files:
+    #     filename = obj_dict[file]
+    #     src = os.path.join(folder, filename)
+    #     dest = os.path.join(folder, 'tumor_immune', filename)
+    #     shutil.move(src, dest)
+
+    overlap_files  = list(tumor_set.intersection(immune_set))
+    for objID in overlap_files:
+        row = df[df['Object ID'] == objID]
+        if row.iloc[0]['Number of Immune Cell'] > row.iloc[0]['Number of Tumor Cell']:
+            immune_files.append(objID)
+        else:
+            tumor_files.append(objID)
 
     for file in tumor_files:
         filename = obj_dict[file]
@@ -166,13 +171,13 @@ def color_code(folder:str):
         output_image = Image.blend(input_image, color_layer, alpha=0.3)
         output_image.save(os.path.join(folder, 'merge', os.path.basename(file.split('.')[0])+ '.jpg'))
         print(f'save {file}')
-    tumor_immune = glob(os.path.join(folder, 'tumor_immune', '*.png'))
-    for file in tumor_immune:
-        input_image = Image.open(file)
-        color_layer = Image.new('RGB', input_image.size, yellow)
-        output_image = Image.blend(input_image, color_layer, alpha=0.3)
-        output_image.save(os.path.join(folder, 'merge', os.path.basename(file.split('.')[0])+'.jpg'))
-        print(f'save {file}')
+    # tumor_immune = glob(os.path.join(folder, 'tumor_immune', '*.png'))
+    # for file in tumor_immune:
+    #     input_image = Image.open(file)
+    #     color_layer = Image.new('RGB', input_image.size, yellow)
+    #     output_image = Image.blend(input_image, color_layer, alpha=0.3)
+    #     output_image.save(os.path.join(folder, 'merge', os.path.basename(file.split('.')[0])+'.jpg'))
+    #     print(f'save {file}')
             
     
 def x_sort_key(filename):
@@ -195,12 +200,12 @@ def rename_all(folder:str):
     '''
     rename each tile in merge folder to prepare for merging
     from Qupath format (x-1234-y-1234-w-1234-h-1234) 
-    to OpenSlide format (x_y) where x and y should begin at 0 
+    to OpenSlide format (x_y) where x and y should start from 0 
     '''
     merge_dir = os.path.join(folder, 'merge')
     tiles = [file for file in os.listdir(merge_dir) if file.endswith(('.jpg'))]
     if len(tiles)>0:
-        sorted_x = sorted(tiles, key=x_sort_key)   # original names, just sorted order
+        sorted_x = sorted(tiles, key=x_sort_key)   # original names in sorted order
         coorx = {}
         split_sorted_x = []
         for name in sorted_x:
@@ -238,7 +243,8 @@ if __name__ == '__main__':
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-21-01_HE-STAIN_20210825_143722', '21RR060004-A-29-01_HE-STAIN_20210825_150200']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-12-01_HE-STAIN_20210825_161001', '19RR060020-A-07-01_HE-STAIN_20190711_004017', '18rr060026-a-24-01_he-stain_20180301_113449']]
-    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
+    # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
+    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR060061-A-10-01_HE-STAIN_20191014_162043']]
     for folder in folders:
         split_to_groups(folder)
         copy_to_merge(folder)

@@ -6,7 +6,7 @@ import csv
 
 def count_files(directory:str, target:str):
     '''
-    for each WSI, get the number of files removed for targeted category
+    for each WSI, get the number of files removed/filtered out for targeted category
     directory: parent folder containing the subfolders representing each WSI
     target: targeted folder, e.g., blank
     returns a csv storing the image ID and their respective number of files removed
@@ -43,18 +43,18 @@ def undo_filter(directory:str, target:list=None):
     directory: parent folder containing the subfolders representing each WSI
     target: list of folders to be involved, e.g., [blank, rbc]
     '''
+
     if target is not None:
-        for cat in target:
-            for root, folders, _ in os.walk(directory):
-                for folder in folders:
-                    for parent, subfolders, _ in os.walk(os.path.join(root, folder)):
-                        for subfolder in subfolders:
-                            if subfolder == cat:
-                            # Create the full path of the source file
-                                files = glob(os.path.join(parent, subfolder, "*.png"))
-                                for file in files:
-                                    dest = os.path.join(root, folder, os.path.basename(file))
-                                    shutil.move(file, dest)
+        for root, folders, _ in os.walk(directory):
+            for folder in folders:
+                for parent, subfolders, _ in os.walk(os.path.join(root, folder)):
+                    for subfolder in subfolders:
+                        if subfolder in target:
+                        # Create the full path of the source file
+                            files = glob(os.path.join(parent, subfolder, "*.png"))
+                            for file in files:
+                                dest = os.path.join(root, folder, os.path.basename(file))
+                                shutil.move(file, dest)
     else: 
         for root, folders, _ in os.walk(directory):
             for folder in folders:
@@ -102,8 +102,9 @@ if __name__ == '__main__':
     # undo_filter(PARENT_DIR, ['tumor', 'immune', 'tumor_immune'])
     # undo_filter(PARENT_DIR)
     # count_files(PARENT_DIR, 'blank')
-    delete_file(PARENT_DIR, 'detection_031123.csv')
+    # delete_file(PARENT_DIR, 'detection_031123.csv')
     # delete_folder(PARENT_DIR, 'merge')
+    delete_folder(PARENT_DIR, 'tumor_immune')
     
     
 

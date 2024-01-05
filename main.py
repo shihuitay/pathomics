@@ -94,11 +94,13 @@ class WSI_Pipeline:
                 self.fold += 1
 
     def get_coor(self, cropped=False):
-        '''get the coordinates of the filtered tiles
-        to locate the tiles on WSI in Qupath later'''
+        '''get the coordinates of the filtered tiles 
+        to locate the tiles on WSI in Qupath later
+        cropped = whether the original WSI was cropped'''
         filtered =  [entry for entry in os.listdir(self.tile_dir) if entry.endswith(('.png', '.tif'))]
         self.filtered = len(filtered)
         coors = []
+        # Qupath requires the objectID to be Universally Unique Identifier
         unique_ids = [str(uuid.uuid4()) for _ in range(len(filtered))]
         if cropped:
             for filename , id_ in zip(filtered, unique_ids):
@@ -134,7 +136,6 @@ class WSI_Pipeline:
                 my_dict["coor"] = coor
                 coors.append(my_dict)
         
-
         # save filename:objectID to csv
         csv_file = os.path.join(self.tile_dir, 'objectID.csv')
         key_to_skip = 'coor'
