@@ -244,9 +244,13 @@ if __name__ == '__main__':
     # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-12-01_HE-STAIN_20210825_161001', '19RR060020-A-07-01_HE-STAIN_20190711_004017', '18rr060026-a-24-01_he-stain_20180301_113449']]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
-    folders = [os.path.join(PARENT_DIR, file) for file in ['19RR060061-A-10-01_HE-STAIN_20191014_162043']]
-    for folder in folders:
-        split_to_groups(folder)
-        copy_to_merge(folder)
-        color_code(folder)
-        rename_all(folder)
+    exclude = [os.path.join(PARENT_DIR, file) for file in ['19RR060061-A-10-01_HE-STAIN_20191014_162043', '19RR000008-A-62-01_HE-STAIN_20190704_143754']]
+    folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv') and p!= 'unwanted']
+    for folder in folders[16:]:
+        if folder in exclude:
+            continue
+        else:
+            split_to_groups(folder)
+            copy_to_merge(folder)
+            color_code(folder)
+            rename_all(folder)

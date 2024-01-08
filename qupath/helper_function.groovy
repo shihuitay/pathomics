@@ -61,20 +61,11 @@ println("All annotations have been deleted.")
 /***** crop/save the region of the currently selected object *****/
 def server = getCurrentServer()
 def name = getCurrentServer().getMetadata().getName()
+// def filename = name.split("\\_")[1] + '.jpeg'
 def annotations = getAnnotationObjects()
 annotations.each { annotation ->
     def roi = annotation.getROI()
-    def requestROI = RegionRequest.createInstance(server.getPath(), 2, roi)
-    writeImageRegion(server, requestROI, "/Users/shihuitay/Desktop/pathomics/data/cropped/${name}")
-    print "Done! ${name}"}
-// Write the region of the image corresponding to the currently-selected object
-def server = getCurrentServer()
-def name = getCurrentServer().getMetadata().getName()
-def annotations = getAnnotationObjects()
-//def outputFileName = name.tokenize('.')[0] + '.ome.tif'
-//print outputFileName
-annotations.each { annotation ->
-    def roi = annotation.getROI()
-    def requestROI = RegionRequest.createInstance(server.getPath(), 1, roi)
+    // createInstance(String path, double downsample, ImageRegion region).
+    def requestROI = RegionRequest.createInstance(server.getPath(), 2, roi)  
     writeImageRegion(server, requestROI, "/Users/shihuitay/Desktop/pathomics/data/cropped/${name}")
     print "Done! ${name}"}
