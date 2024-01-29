@@ -3,9 +3,9 @@
  * export the results (cell counts for each category as csv file)
  */
 
-// delete pre-existed annotations if needed
-// def annotations = getAnnotationObjects() // Get a list of all annotation objects
-// removeObjects(annotations, false) // True indicates that you want to keep the contained objects, while false removes everything
+// IMPORTANT!!!: delete pre-existed annotations if needed  
+// def annotations_ = getAnnotationObjects() // Get a list of all annotation objects
+// removeObjects(annotations_, false) // True indicates that you want to keep the contained objects, while false removes everything
 // println("All annotations have been deleted.")
 
 import qupath.lib.gui.scripting.QPEx

@@ -48,7 +48,7 @@ def csvCells = "Object ID,Number of Tumor Cell,Number of Immune Cell\n" +
 
 // Write CSV content to the file
 try {
-    def csvWriter = new FileWriter("${parent_dir}/${filename}/detection_new.csv")
+    def csvWriter = new FileWriter("${parent_dir}/${filename}/detection.csv")
     csvWriter.append(csvCells.toString())
     csvWriter.flush()
     csvWriter.close()

@@ -3,10 +3,6 @@ import pandas as pd
 import numpy as np
 import shutil
 import re
-import os
-import re
-import shutil
-import pandas as pd
 from glob import glob
 from PIL import Image, ImageDraw
 
@@ -94,19 +90,23 @@ def save_q1s(directory:str):
             final_data.loc[len(final_data)] = new_row
     final_data.to_csv(os.path.join(directory, 'q1.csv')) 
 
-def split_to_groups(folder:str):
+def split_to_groups(folder:str, tumor_median=None, immune_median=None):
     '''folder: absolute path to the target folder'''
     parent = os.path.dirname(folder)
-    final_csv = pd.read_csv(os.path.join(parent, 'median.csv'))
-    global_median = final_csv.set_index('Filename')[['Global median tumor', 'Global median immune']].to_dict()
     os.makedirs(os.path.join(folder, 'tumor'), exist_ok=True)
     os.makedirs(os.path.join(folder, 'immune'), exist_ok=True)
     # os.makedirs(os.path.join(folder, 'tumor_immune'), exist_ok=True)
     obj_id =  pd.read_csv(os.path.join(folder, 'objectID.csv'))
     obj_dict = dict(zip(obj_id['id'], obj_id['filename']))
     df = pd.read_csv(os.path.join(folder, 'detection.csv'))
-    tumor = df[df['Number of Tumor Cell'] > global_median['Global median tumor'][os.path.basename(folder)]] 
-    immune = df[df['Number of Immune Cell'] > global_median['Global median immune'][os.path.basename(folder)]] 
+    if tumor_median is None and immune_median is None:
+        final_csv = pd.read_csv(os.path.join(parent, 'median.csv'))
+        global_median = final_csv.set_index('Filename')[['Global median tumor', 'Global median immune']].to_dict()
+        tumor = df[df['Number of Tumor Cell'] > global_median['Global median tumor'][os.path.basename(folder)]] 
+        immune = df[df['Number of Immune Cell'] > global_median['Global median immune'][os.path.basename(folder)]] 
+    else:
+        tumor = df[df['Number of Tumor Cell'] > tumor_median] 
+        immune = df[df['Number of Immune Cell'] > immune_median] 
     tumor_set = set(tumor['Object ID'].tolist())
     immune_set = set(immune['Object ID'].tolist())
     tumor_files = list(tumor_set.difference(immune_set))
@@ -179,7 +179,6 @@ def color_code(folder:str):
     #     output_image.save(os.path.join(folder, 'merge', os.path.basename(file.split('.')[0])+'.jpg'))
     #     print(f'save {file}')
             
-    
 def x_sort_key(filename):
     '''sort the files based on x-'''
     match = re.search(r'x-(\d+)', filename)
@@ -234,23 +233,15 @@ def rename_all(folder:str):
 
 
 if __name__ == '__main__':
-    PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
+    # PARENT_DIR = '/Users/shihuitay/Desktop/pathomics/data/250'
+    PARENT_DIR = '/Users/shihuitay/Desktop/A vs D/IMAGES FOR SHIHUI (L and AD)/AD/data/250'
     # save_medians(PARENT_DIR)
     # save_q1s(PARENT_DIR)
     # folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv') and p!= 'unwanted']
-    # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-42-01_HE-STAIN_20190703_173035', '19RR060020-A-07-01_HE-STAIN_20190711_004017']]
-    # folders = [os.path.join(PARENT_DIR, file) for file in ['18rr060026-a-05-01_he-stain_20180226_223447']]
-    # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-21-01_HE-STAIN_20210825_143722', '21RR060004-A-29-01_HE-STAIN_20210825_150200']]
-    # folders = [os.path.join(PARENT_DIR, file) for file in ["17RR060061-A-08-01_HE-STAIN_20171130_182935","18RR060016-A-18-01_HE-STAIN_20190711_121402"]]
     # folders = [os.path.join(PARENT_DIR, file) for file in ['21RR060004-A-12-01_HE-STAIN_20210825_161001', '19RR060020-A-07-01_HE-STAIN_20190711_004017', '18rr060026-a-24-01_he-stain_20180301_113449']]
-    # folders = [os.path.join(PARENT_DIR, file) for file in ['19RR000008-A-62-01_HE-STAIN_20190704_143754']]
-    exclude = [os.path.join(PARENT_DIR, file) for file in ['19RR060061-A-10-01_HE-STAIN_20191014_162043', '19RR000008-A-62-01_HE-STAIN_20190704_143754']]
     folders = [os.path.abspath(os.path.join(PARENT_DIR, p)) for p in os.listdir(PARENT_DIR) if p!= '.DS_Store' and not p.endswith('.csv') and p!= 'unwanted']
-    for folder in folders[16:]:
-        if folder in exclude:
-            continue
-        else:
-            split_to_groups(folder)
-            copy_to_merge(folder)
-            color_code(folder)
-            rename_all(folder)
+    for folder in folders[1:2]:
+        split_to_groups(folder, tumor_median=31, immune_median=15)
+        copy_to_merge(folder)
+        color_code(folder)
+        rename_all(folder)
